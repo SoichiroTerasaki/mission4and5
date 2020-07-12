@@ -41,7 +41,6 @@
     	}
     	echo "<hr>";
     	
-    	$pw = $_POST["password"];
     	
 
         
@@ -51,18 +50,20 @@
             $name = $_POST["name"]; #name : 入力された名前の値を取得
             $comment = $_POST["comment"]; #comment : 入力されたコメントの値を取得
             $date = date("Y年m月d日 H:i:s"); #date : 投稿日時を取得
+            $pw = $_POST["password"];
             echo isset($_POST["option"]);
         #編集用の書き込みをするとき
             #if (isset($_POST["option"])){
             if ($_POST["option"] != ""){
                 echo "編集書き込み完了";
             	$option = $_POST["option"];
-            	$sql = 'UPDATE mission5_1 SET name=:name,comment=:comment,date=:date WHERE id=:id';
+            	$sql = 'UPDATE mission5_1 SET name=:name,comment=:comment,date=:date,pw=:pw WHERE id=:id';
             	$stmt = $pdo->prepare($sql);
             	$stmt->bindParam(':id', $option, PDO::PARAM_INT);
             	$stmt->bindParam(':name', $name, PDO::PARAM_STR);
             	$stmt->bindParam(':comment', $comment, PDO::PARAM_STR);
             	$stmt->bindParam(':date', $date, PDO::PARAM_STR);
+            	$stmt->bindParam(':pw', $pw, PDO::PARAM_STR);
             	$stmt->execute();
             }
         #通常の新規書き込みをするとき
@@ -83,6 +84,7 @@
         else if (isset($_POST["delete"])){
             
             $delete_id = $_POST["delete_num"];
+            $delete_password = $_POST["delete_password"];
             $sql = 'SELECT * FROM mission5_1 WHERE id=:id ';
             
             $stmt = $pdo->prepare($sql);                  // ←差し替えるパラメータを含めて記述したSQLを準備し、
@@ -91,7 +93,7 @@
             
             $results = $stmt->fetchAll();
             
-            if ($results[0]['pw'] == $pw){
+            if ($results[0]['pw'] == $delete_password){
                 echo "削除しました";
             	$sql = 'delete from mission5_1 where id=:id';
             	$stmt = $pdo->prepare($sql);
@@ -106,6 +108,7 @@
     #編集ボタンが押されたとき    
         else if (isset($_POST["edit"])){
             $num = $_POST["edit_num"];
+            $edit_password = $_POST["edit_password"];
             $sql = 'SELECT * FROM mission5_1 WHERE id=:id ';
             
             $stmt = $pdo->prepare($sql);                  // ←差し替えるパラメータを含めて記述したSQLを準備し、
@@ -113,11 +116,12 @@
             $stmt->execute();                             // ←SQLを実行する。
             
             $results = $stmt->fetchAll(); 
-            if ($results[0]['pw'] == $pw){
+            if ($results[0]['pw'] == $edit_password){
                 echo "編集中";
                 $edit_id = $results[0]['id'];
         		$edit_name = $results[0]['name'];
         		$edit_comment = $results[0]['comment'];
+        		$edit_pw = $results[0]['pw'];
             }
         	else {
         	    echo "パスワードが違います<br>";
@@ -147,14 +151,16 @@
         <input type="text" name="name" value="<?php echo $edit_name; ?>" placeholder="名前"><br> <!--コメントフォームの作成-->
         <input type="text" name="comment" value="<?php echo $edit_comment; ?>" placeholder="コメント"><br>
         
-        <input type="text" name="password" placeholder="パスワード"><br>
+        <input type="text" name="password" value="<?php echo $edit_pw; ?>" placeholder="パスワード"><br>
         <input type="submit" name="submit" value="送信"><br>
         
         <input type="number" name="delete_num" placeholder="削除したい番号を入力"> <!--削除フォームの作成-->
+        <input type="text" name="delete_password" placeholder="パスワード"><br>
         <input type="submit" name="delete" value="削除"><br>
         
         <input type="number" name="edit_num" placeholder="編集したい番号を入力"> <!--編集フォームの作成-->
-        <input type="submit" name="edit" value="編集">
+        <input type="text" name="edit_password" placeholder="パスワード"><br>
+        <input type="submit" name="edit" value="編集"><br>
         
         
         
