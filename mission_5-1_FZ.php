@@ -1,3 +1,5 @@
+<!--FileZillaを使うと、編集ボタンを押していないのにformタグのinput valueに何かしらの値が表示されて困ったけど、このように書き直したら治った。-->
+
 <!DOCTYPE html>
 <html lang="ja">
 <head>
